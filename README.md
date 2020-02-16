@@ -29,6 +29,7 @@ Note that PEG notation has many dialects in implementation of PEG-parser generat
     * UNICODE character categories such as `[\pL]` or `[\pNd]`
     * You can use the following PEG definition operator:`=` `<-` `←` `⟵`
     * Ability to Embed Go codes
+    * Generated parser is independent from Pigeon lib
   * BSD-based license
 * Cons
   * Too Go-specific notation (I have to set the PEG file extension to `.go` to make syntax highlighint work...)

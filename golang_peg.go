@@ -1,3 +1,8 @@
+{
+package go_parser
+}
+
+
 // # The followings are based on the scraped EBNF ###################################
 
 // # Characters =============================
