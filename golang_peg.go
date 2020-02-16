@@ -284,17 +284,32 @@ ReceiverType    "receiver type"                 = Type
 
 // # Operators ============================
 
+// Precedence    Operator
+//     5             *  /  %  <<  >>  &  &^
+//     4             +  -  |  ^
+//     3             ==  !=  <  <=  >  >=
+//     2             &&
+//     1             ||
+
 Expression      "expression"                    = UnaryExpr
                                                 / Expression binary_op Expression
 
 UnaryExpr       "unary expression"              = PrimaryExpr
                                                 / unary_op UnaryExpr
 
-binary_op       "binary operator"               = LOR           // "||"
-                                                / LAND          // "&&"
-                                                / rel_op
+unary_op        "unary operator"                = PLUS          // "+"
+                                                / MINUS         // "-"
+                                                / NOT           // "!"
+                                                / NEG           // "^"
+                                                / ADDR          // "*"
+                                                / REFR          // "&"
+                                                / ARROW         // "<-"
+
+binary_op       "binary operator"               = mul_op
                                                 / add_op
-                                                / mul_op
+                                                / rel_op
+                                                / LAND          // "&&"
+                                                / LOR           // "||"
 
 rel_op          "comparison operator"           = EQL           // "=="
                                                 / NEQ           // "!="
@@ -315,15 +330,6 @@ mul_op          "multiplication operator"       = MUL           // "*"
                                                 / SHR           // ">>"
                                                 / AND           // "&"
                                                 / AND_NOT       // "&^"
-
-
-unary_op        "unary operator"                = PLUS          // "+"
-                                                / MINUS         // "-"
-                                                / NOT           // "!"
-                                                / NEG           // "^"
-                                                / ADDR          // "*"
-                                                / REFR          // "&"
-                                                / ARROW         // "<-"
 
 // # Conversions ==========================
 
