@@ -16,7 +16,7 @@ PEG is a strict analytical formal grammar that has an ability to describe formal
 
 Note that PEG notation has many dialects in implementation of PEG-parser generators. See also Pigeon's Wiki above.
 
-* [https://github.com/pointlander/peg](pointlander/peg) for Go
+* [pointlander/peg](https://github.com/pointlander/peg) for Go
 * [pegjs/pegjs](https://github.com/pegjs/pegjs) for JavaScript
 * [erikrose/parsimonious](https://github.com/erikrose/parsimonious) for Python
 * [kschiess/parslet](https://github.com/kschiess/parslet) for Ruby

@@ -398,12 +398,13 @@ ExprSwitchCase  "expression of switch's 'case'"     = "case" ExpressionList
 
 // # Type switches -------------------------
 
-TypeSwitchStmt  "type-switch statement"   = "switch" ( SimpleStmt ";" )? TypeSwitchGuard "{" ( TypeCaseClause )* "}"
-TypeSwitchGuard "type-switch guard"       = ( identifier ":=" ) PrimaryExpr "." "(" "type" ")"
-TypeCaseClause  "type-switch clause"      = TypeSwitchCase ":" StatementList
-TypeSwitchCase  "type-switch case"        = "case" TypeList
-                                          / "default"
-TypeList        "type list"               = Type ( "," Type )*
+TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt ";" )? TypeSwitchGuard "{" ( TypeCaseClause )* "}"
+TypeSwitchGuard "type-switch guard"             = ( identifier ":=" ) PrimaryExpr "." "(" "type" ")"
+TypeCaseClause  "type-switch clause"            = TypeSwitchCase ":" StatementList
+TypeSwitchCase  "type-switch case"              = "case" TypeList
+                                                / "default"
+
+TypeList        "type list"                     = Type ( "," Type )*
 
 // # 'for' statements ======================
 
