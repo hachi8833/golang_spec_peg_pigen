@@ -1,3 +1,5 @@
+// # The followings are based on the scraped EBNF ###################################
+
 // # Characters =============================
 
 newline           "line feed"                   = [U+000A]
@@ -473,3 +475,130 @@ PackageName     "package name"                  = identifier
 ImportDecl      "'import' declaration"          = "import" ( ImportSpec / "(" ( ImportSpec ";" )* ")" )
 ImportSpec      "import specification"          = ( "." / PackageName )? ImportPath
 ImportPath      "import path"                   = string_lit
+
+
+// # Operators and delimiters ##################################################
+// via https://github.com/golang/go/src/go/token/token.go
+
+// # primitive signs -----------------------
+
+SEMICOLON         "semicolon"                   = ';'
+COLON             "colon"                       = ':'
+DOT               "dot"                         = '.'
+
+LPAREN            "left parenthesis"            = '('
+LBRACK            "left bracket"                = '['
+LBRACE            "left brace"                  = '{'
+COMMA             "comma"                       = ','
+PERIOD            "period"                      = '.'
+
+RPAREN            "right parenthesis"           = ')'
+RBRACK            "right bracket"               = ']'
+RBRACE            "right brace"                 = '}'
+
+PLUS              "plus"                        = '+'
+MINUS             "minus"                       = '-'
+ASTERISK          "asterisk"                    = '*'
+SLASH             "slash"                       = '/'
+
+EQUAL             "equal"                       = '='
+LSS               "less than"                   = '<'
+GTR               "greater than"                = '>'
+
+AMPER             "ampersand"                   = '&'
+BANG              "bang"                        = '!'
+HAT               "hat"                         = '^'
+PERCENT           "percent"                     = '%'
+BAR               "bar"                         = '|'
+
+DQUO              "double quote"                = [U+0022]        // "
+SQUO              "single quote"                = [U+0027]        // '
+BQUO              "back quote/grave accent"     = [U+0060]        // `
+
+LF                "line feed"                   = [U+000A]
+// CR                "carriage return"             = [U+000D]
+// TAB               "horizontal tab"              = [U+0009]
+// SPACE             "white space"                 = [U+0020]
+
+// AT                "atmark"                      = '@'
+// NUM               "number"                      = '#'
+// TILDA             "tilda"                       = '~'
+
+// # operators/delimiters ------------------
+
+NOT               "not"                         = BANG            // '!'
+
+ADD               "add"                         = PLUS            // '+'
+SUB               "subtract"                    = MINUS           // '-'
+MUL               "multiply"                    = ASTERISK        // '*'
+QUO               "quotient"                    = SLASH           // '/'
+REM               "remainder"                   = PERCENT         // '%
+
+AND               "bit: AND"                    = AMPER           // '&'
+OR                "bit: OR"                     = BAR             // '|'
+XOR               "bit: XOR"                    = HAT             // '^'
+AND_NOT           "bit: AND NOT"                = AMPER HAT       // '&^'
+
+SHL               "bit: shift left"             = LSS LSS         // '<<'
+SHR               "bit: shift right"            = GTR GTR         // '>>'
+
+LAND              "logical AND"                 = AMPER AMPER     // '&&'
+LOR               "logical OR"                  = BAR BAR         // '||'
+ARROW             "arrow"                       = LSS MINUS       // '<-'
+INC               "increment"                   = PLUS PLUS       // '++'
+DEC               "decrement"                   = MINUS MINUS     // '--'
+
+EQL               "equal"                       = EQUAL EQUAL     // '=='
+NEQ               "not equal"                   = BANG EQUAL      // '!='
+LEQ               "less or equal"               = LSS EQUAL       // '<='
+GEQ               "greater or equal"            = GTR EQUAL       // '>='
+DEFINE            "define"                      = COLON EQUAL     // ':='
+ELLIPSIS          "ellipsis"                    = DOT DOT DOT     // '...'
+
+ASSIGN            "assign"                      = EQUAL           // '='
+ADD_ASSIGN        "assign: add"                 = PLUS EQUAL      // '+='
+SUB_ASSIGN        "assign: subtract"            = MINUS EQUAL     // '-='
+MUL_ASSIGN        "assign: multiply"            = ASTERISK EQUAL  // '*='
+QUO_ASSIGN        "assign: quotient"            = SLASH EQUAL     // '/='
+REM_ASSIGN        "assign: remainder"           = PERCENT EQUAL   // '%='
+
+AND_ASSIGN        "assign: logical AND"         = AMPER EQUAL     // '&='
+OR_ASSIGN         "assign: logical OR"          = BAR EQUAL       // '|='
+XOR_ASSIGN        "assign: logical XOR"         = HAT EQUAL       // '^='
+AND_NOT_ASSIGN    "assign: logical AND NOT"     = AMPER HAT EQUAL // '&^='
+
+SHL_ASSIGN        "assign: shift left"          = LSS LSS EQUAL   // '<<='
+SHR_ASSIGN        "assign: shift right"         = GTR GTR EQUAL   // '>>='
+
+// # Keywords ===============================
+// via https://github.com/golang/go/src/go/token/token.go
+
+Keyword           "keyword"                     = "break"
+                                                / "case"
+                                                / "chan"
+                                                / "const"
+                                                / "continue"
+
+                                                / "default"
+                                                / "defer"
+                                                / "else"
+                                                / "fallthrough"
+                                                / "for"
+
+                                                / "func"
+                                                / "go"
+                                                / "goto"
+                                                / "if"
+                                                / "import"
+
+                                                / "interface"
+                                                / "map"
+                                                / "package"
+                                                / "range"
+                                                / "return"
+
+                                                / "select"
+                                                / "struct"
+                                                / "switch"
+                                                / "type"
+                                                / "var"
