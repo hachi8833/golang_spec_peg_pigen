@@ -2,14 +2,14 @@
 
 // # Characters =============================
 
-newline           "line feed"                   = [U+000A]
+newline           "line feed"                   = LF
 unicode_char      "unicode char"                = &[\pL] !newline
 unicode_letter    "unicode letter"              = [\pL]
 unicode_digit     "unicode digit"               = [\pNd]
 
 // # Letters    =============================
 
-letter            "letter"                      = unicode_letter / "_"
+letter            "letter"                      = unicode_letter / UBAR
 decimal_digit     "decimal digit"               = [0-9]
 binary_digit      "binary digit"                = "0" / "1"
 octal_digit       "octal digit"                 = [0-7]
@@ -26,33 +26,33 @@ int_lit           "integer literal"             = decimal_lit
                                                 / octal_lit
                                                 / hex_lit
 
-decimal_lit       "decimal literal"             = "0" / ( [1-9] ) ( ( "_" )? decimal_digits )?
-binary_lit        "binary literal"              = "0" ( "b" / "B" ) ( "_" )? binary_digits
-octal_lit         "octal literal"               = "0" ( "o" / "O" ) ( "_" )? octal_digits
-hex_lit           "hexadecimal literal"         = "0" ( "x" / "X" ) ( "_" )? hex_digits
+decimal_lit       "decimal literal"             = "0" / ( [1-9] ) ( ( UBAR )? decimal_digits )?
+binary_lit        "binary literal"              = "0" ( "b" / "B" ) ( UBAR )? binary_digits
+octal_lit         "octal literal"               = "0" ( "o" / "O" ) ( UBAR )? octal_digits
+hex_lit           "hexadecimal literal"         = "0" ( "x" / "X" ) ( UBAR )? hex_digits
 
-decimal_digits    "decimal digits"              = decimal_digit ( ( "_" )? decimal_digit )*
-binary_digits     "binary digits"               = binary_digit ( ( "_" )? binary_digit )*
-octal_digits      "octal digits"                = octal_digit ( ( "_" )? octal_digit )*
-hex_digits        "hexadecimal digits"          = hex_digit ( ( "_" ) hex_digit )*
+decimal_digits    "decimal digits"              = decimal_digit ( ( UBAR )? decimal_digit )*
+binary_digits     "binary digits"               = binary_digit ( ( UBAR )? binary_digit )*
+octal_digits      "octal digits"                = octal_digit ( ( UBAR )? octal_digit )*
+hex_digits        "hexadecimal digits"          = hex_digit ( ( UBAR ) hex_digit )*
 
 // # Floating-point literals ================
 
 float_lit         "float literal"               = decimal_float_lit
                                                 / hex_float_lit
 
-decimal_float_lit "decimal float literal"       = decimal_digits "." ( decimal_digits )? ( decimal_exponent )?
+decimal_float_lit "decimal float literal"       = decimal_digits DOT ( decimal_digits )? ( decimal_exponent )?
                                                 / decimal_digits decimal_exponent
-                                                / "." decimal_digits ( decimal_exponent )?
+                                                / DOT decimal_digits ( decimal_exponent )?
 
-decimal_exponent  "decimal exponent"            = ( "e" / "E" ) ( "+" / "-" )? decimal_digits
+decimal_exponent  "decimal exponent"            = ( "e" / "E" ) ( PLUS / MINUS )? decimal_digits
 
 hex_float_lit     "hexadecimal float literal"   = "0" ( "x" / "X" ) hex_mantissa hex_exponent
-hex_mantissa      "hexadecimal mantissa"        = ( "_" )? hex_digits "." ( hex_digits )?
-                                                / ( "_" )? hex_digits
-                                                / "." hex_digits
+hex_mantissa      "hexadecimal mantissa"        = ( UBAR )? hex_digits DOT ( hex_digits )?
+                                                / ( UBAR )? hex_digits
+                                                / DOT hex_digits
 
-hex_exponent      "hexadecimal exponent"        = ( "p" / "P" ) ( "+" / "-" )? decimal_digits
+hex_exponent      "hexadecimal exponent"        = ( "p" / "P" ) ( PLUS / MINUS )? decimal_digits
 
 // # Imaginary literals =====================
 
@@ -60,7 +60,7 @@ imaginary_lit    "imaginary literal"            = (decimal_digits / int_lit / fl
 
 // # Rune literals ==========================
 
-rune_lit         "rune literal"                 = "'" ( unicode_value / byte_value ) "'"
+rune_lit         "rune literal"                 = SQUO ( unicode_value / byte_value ) SQUO
 unicode_value    "unicode value"                = unicode_char
                                                 / little_u_value
                                                 / big_u_value
@@ -69,27 +69,27 @@ unicode_value    "unicode value"                = unicode_char
 byte_value       "byte value"                   = octal_byte_value
                                                 / hex_byte_value
 
-octal_byte_value "octal byte value"             = `\` octal_digit octal_digit octal_digit
-hex_byte_value   "hexadecimal byte value"       = `\` "x" hex_digit hex_digit
-little_u_value   "little u value"               = `\` "u" hex_digit hex_digit hex_digit hex_digit
-big_u_value      "big U value"                  = `\` "U" hex_digit hex_digit hex_digit hex_digit
+octal_byte_value "octal byte value"             = BQUO octal_digit octal_digit octal_digit
+hex_byte_value   "hexadecimal byte value"       = BQUO "x" hex_digit hex_digit
+little_u_value   "little u value"               = BQUO "u" hex_digit hex_digit hex_digit hex_digit
+big_u_value      "big U value"                  = BQUO "U" hex_digit hex_digit hex_digit hex_digit
                                                           hex_digit hex_digit hex_digit hex_digit
 
-escaped_char     "rune escaped char"            = `\` ( "a" / "b" / "f" / "n" / "r" / "t" / "v" / `\` / "'" / `"` )
+escaped_char     "rune escaped char"            = BSLASH ( "a" / "b" / "f" / "n" / "r" / "t" / "v" / BSLASH / SQUO / DQUO )
 
 // # String literals ========================
 
 string_lit             "string literal"             = raw_string_lit
                                                     / interpreted_string_lit
 
-raw_string_lit         "raw string literal"         = "`" ( unicode_char / newline )* "`"
-interpreted_string_lit "interpreted string literal" = `"` ( unicode_value / byte_value )* `"`
+raw_string_lit         "raw string literal"         = BQUO ( unicode_char / newline )* BQUO
+interpreted_string_lit "interpreted string literal" = DQUO ( unicode_value / byte_value )* DQUO
 
 // # Types ==================================
 
 Type            "type"                          = TypeName
                                                 / TypeLit
-                                                / "(" Type ")"
+                                                / LPAREN Type RPAREN
 
 TypeName        "type name"                     = identifier
                                                 / QualifiedIdent
@@ -105,24 +105,24 @@ TypeLit         "type literal"                  = ArrayType
 
 // # Array types ----------------------------
 
-ArrayType       "array type"                    = "[" ArrayLength "]" ElementType
+ArrayType       "array type"                    = LBRACK ArrayLength RBRACK ElementType
 ArrayLength     "array length"                  = Expression
 ElementType     "element type"                  = Type
 
 // # Slice types ----------------------------
 
-SliceType       "slice type"                    = "[" "]" ElementType
+SliceType       "slice type"                    = LBRACK RBRACK ElementType
 
 // # Struct types ---------------------------
 
-StructType      "struct type"                   = "struct" "{" ( FieldDecl ";" )* "}"
+StructType      "struct type"                   = "struct" LBRACE ( FieldDecl SEMICOLON )* RBRACE
 FieldDecl       "struct field declaration"      = (IdentifierList Type / EmbeddedField) ( Tag )?
-EmbeddedField   "struct embedded field"         = ( "*" )? TypeName
+EmbeddedField   "struct embedded field"         = ( ASTERISK )? TypeName
 Tag             "struct tag"                    = string_lit
 
 // # Pointer types --------------------------
 
-PointerType     "pointer type"                  = "*" BaseType
+PointerType     "pointer type"                  = ASTERISK BaseType
 BaseType        "base type"                     = Type
 
 // # Function types -------------------------
@@ -131,13 +131,13 @@ FunctionType    "function type"                   = "func" Signature
 Signature       "function signature"              = Parameters ( Result )?
 Result          "function result"                 = Parameters
                                                   / Type
-Parameters      "function parameters"             = "(" ( ParameterList ( "," )? )? ")"
-ParameterList   "function parameter list"         = ParameterDecl ( "," ParameterDecl )?
-ParameterDecl   "function parameter declaration"  = ( IdentifierList )? ( "..." )? Type
+Parameters      "function parameters"             = LPAREN ( ParameterList ( COMMA )? )? RPAREN
+ParameterList   "function parameter list"         = ParameterDecl ( COMMA ParameterDecl )?
+ParameterDecl   "function parameter declaration"  = ( IdentifierList )? ( ELLIPSIS )? Type
 
 // # Interface types ------------------------
 
-InterfaceType      "interface type"             = "interface" "{" ( MethodSpec ";" )? "}"
+InterfaceType      "interface type"             = "interface" LBRACE ( MethodSpec SEMICOLON )? RBRACE
 MethodSpec         "method specification"       = MethodName Signature
                                                 / InterfaceTypeName
 
@@ -146,17 +146,17 @@ InterfaceTypeName  "interface type name"        = TypeName
 
 // # Map types ------------------------------
 
-MapType         "map type"                      = "map" "[" KeyType "]" ElementType
+MapType         "map type"                      = "map" LBRACK KeyType RBRACK ElementType
 KeyType         "map key type"                  = Type
 
 // # Channel types --------------------------
 
-ChannelType     "channel type"                  = ( "chan" / "chan" "<-" / "<-" "chan" ) ElementType
+ChannelType     "channel type"                  = ( "chan" / "chan" ARROW / ARROW "chan" ) ElementType
 
 // # Blocks =================================
 
-Block           "block"                         = "{" StatementList "}"
-StatementList   "statement list"                = ( Statement ";" )*
+Block           "block"                         = LBRACE StatementList RBRACE
+StatementList   "statement list"                = ( Statement SEMICOLON )*
 
 // # Declarations and scope =================
 
@@ -170,21 +170,21 @@ TopLevelDecl    "top-level declaration"         = Declaration
 
 // # Constant declarations ==================
 
-ConstDecl       "constant declaration"          = "const" ( ConstSpec / "(" ( ConstSpec ";" )* ")" )
-ConstSpec       "constant specification"        = IdentifierList ( ( Type )? "=" ExpressionList )?
+ConstDecl       "constant declaration"          = "const" ( ConstSpec / LPAREN ( ConstSpec SEMICOLON )* RPAREN )
+ConstSpec       "constant specification"        = IdentifierList ( ( Type )? EQUAL ExpressionList )?
 
-IdentifierList  "identifier list"               = identifier ( "," identifier )*
-ExpressionList  "expression list"               = Expression ( "," Expression )*
+IdentifierList  "identifier list"               = identifier ( COMMA identifier )*
+ExpressionList  "expression list"               = Expression ( COMMA Expression )*
 
 // # Type declarations ======================
 
-TypeDecl        "type declaration"              = "type" ( TypeSpec / "(" ( TypeSpec ";" )? ")" )
+TypeDecl        "type declaration"              = "type" ( TypeSpec / LPAREN ( TypeSpec SEMICOLON )? RPAREN )
 TypeSpec        "type specification"            = AliasDecl
                                                 / TypeDef
 
 // # Alias declarations =====================
 
-AliasDecl       "type alias declaration"        = identifier "=" Type
+AliasDecl       "type alias declaration"        = identifier EQUAL Type
 
 // # Type definitions =======================
 
@@ -192,12 +192,12 @@ TypeDef         "type definition"               = identifier Type
 
 // # Variable declarations ==================
 
-VarDecl         "variable declaration"          = "var" ( VarSpec / "(" ( VarSpec ";" )* ")" )
-VarSpec         "variabpe specification"        = IdentifierList ( Type ( "=" ExpressionList )* / "=" ExpressionList )
+VarDecl         "variable declaration"          = "var" ( VarSpec / LPAREN ( VarSpec SEMICOLON )* RPAREN )
+VarSpec         "variabpe specification"        = IdentifierList ( Type ( EQUAL ExpressionList )* / EQUAL ExpressionList )
 
 // # Short variable declarations ============
 
-ShortVarDecl    "short declaration of variable" = IdentifierList ":=" ExpressionList
+ShortVarDecl    "short declaration of variable" = IdentifierList DEFINE ExpressionList
 
 // # Function declarations ==================
 
@@ -214,7 +214,7 @@ Receiver        "method receiver"               = Parameters
 
 Operand         "operand"                       = Literal
                                                 / OperandName
-                                                / "(" Expression ")"
+                                                / LPAREN Expression RPAREN
 
 Literal         "literal"                       = BasicLit
                                                 / CompositeLit
@@ -231,21 +231,21 @@ OperandName     "operand name"                  = identifier
 
 // # Qualified identifiers ==================
 
-QualifiedIdent  "qualified identifier"          = PackageName "." identifier
+QualifiedIdent  "qualified identifier"          = PackageName DOT identifier
 
 // # Composite literals =====================
 
 CompositeLit    "composite literal"             = LiteralType LiteralValue
 LiteralType     "literal type"                  = StructType
                                                 / ArrayType
-                                                / "[" "..." "]" ElementType
+                                                / LBRACK ELLIPSIS RBRACK ElementType
                                                 / SliceType
                                                 / MapType
                                                 / TypeName
 
-LiteralValue    "literal value"                 = "{" ( ElementList ( "," )? )? "}"
-ElementList     "element list"                  = KeyedElement ( "," KeyedElement )*
-KeyedElement    "keyed element"                 = ( Key ":" )? Element
+LiteralValue    "literal value"                 = LBRACE ( ElementList ( COMMA )? )? RBRACE
+ElementList     "element list"                  = KeyedElement ( COMMA KeyedElement )*
+KeyedElement    "keyed element"                 = ( Key COLON )? Element
 Key             "key of element list"           = FieldName
                                                 / Expression
                                                 / LiteralValue
@@ -269,17 +269,17 @@ PrimaryExpr     "primary expression"            = Operand
                                                 / PrimaryExpr TypeAssertion
                                                 / PrimaryExpr Arguments
 
-Selector        "selector in expression"        = "." identifier
-Index           "index in expression"           = "[" Expression "]"
-Slice           "slice in expression"           = "[" ( Expression )? ":" ( Expression )? "]"
-                                                / "[" ( Expression )? ":" Expression ":" Expression "]"
+Selector        "selector in expression"        = DOT identifier
+Index           "index in expression"           = LBRACK Expression RBRACK
+Slice           "slice in expression"           = LBRACK ( Expression )? COLON ( Expression )? RBRACK
+                                                / LBRACK ( Expression )? COLON Expression COLON Expression RBRACK
 
-TypeAssertion   "type assertion"                = "." "(" Type ")"
-Arguments       "arguments"                     = "(" ( ( ExpressionList / Type ( "," ExpressionList )? ) ( "..." )? ( "," )? )? ")"
+TypeAssertion   "type assertion"                = DOT LPAREN Type RPAREN
+Arguments       "arguments"                     = LPAREN ( ( ExpressionList / Type ( COMMA ExpressionList )? ) ( ELLIPSIS )? ( COMMA )? )? RPAREN
 
 // # Method expressions ===================
 
-MethodExpr      "method expression"             = ReceiverType "." MethodName
+MethodExpr      "method expression"             = ReceiverType DOT MethodName
 ReceiverType    "receiver type"                 = Type
 
 // # Operators ============================
@@ -290,44 +290,44 @@ Expression      "expression"                    = UnaryExpr
 UnaryExpr       "unary expression"              = PrimaryExpr
                                                 / unary_op UnaryExpr
 
-binary_op       "binary operator"               = "||"
-                                                / "&&"
+binary_op       "binary operator"               = LOR           // "||"
+                                                / LAND          // "&&"
                                                 / rel_op
                                                 / add_op
                                                 / mul_op
 
-rel_op          "comparison operator"           = "=="
-                                                / "!="
-                                                / "<"
-                                                / "<="
-                                                / ">"
-                                                / ">="
+rel_op          "comparison operator"           = EQL           // "=="
+                                                / NEQ           // "!="
+                                                / LSS           // "<"
+                                                / LEQ           // "<="
+                                                / GTR           // ">"
+                                                / GEQ           // ">="
 
-add_op          "addition operator"             = "+"
-                                                / "-"
-                                                / "|"
-                                                / "^"
+add_op          "addition operator"             = ADD           // "+"
+                                                / SUB           // "-"
+                                                / OR            // "|"
+                                                / XOR           // "^"
 
-mul_op          "multiplication operator"       = "*"
-                                                / "/"
-                                                / "%"
-                                                / "<<"
-                                                / ">>"
-                                                / "&"
-                                                / "&^"
+mul_op          "multiplication operator"       = MUL           // "*"
+                                                / QUO           // "/"
+                                                / REM           // "%"
+                                                / SHL           // "<<"
+                                                / SHR           // ">>"
+                                                / AND           // "&"
+                                                / AND_NOT       // "&^"
 
 
-unary_op        "unary operator"                = "+"
-                                                / "-"
-                                                / "!"
-                                                / "^"
-                                                / "*"
-                                                / "&"
-                                                / "<-"
+unary_op        "unary operator"                = PLUS          // "+"
+                                                / MINUS         // "-"
+                                                / NOT           // "!"
+                                                / NEG           // "^"
+                                                / ADDR          // "*"
+                                                / REFR          // "&"
+                                                / ARROW         // "<-"
 
 // # Conversions ==========================
 
-Conversion      "type conversion"               = Type "(" Expression ( "," )? ")"
+Conversion      "type conversion"               = Type LPAREN Expression ( COMMA )? RPAREN
 
 // # Statements ===========================
 
@@ -360,7 +360,7 @@ EmptyStmt       "empty statement"               = ""
 
 // # Labeled statements ===================
 
-LabeledStmt     "labeled statement"             = Label ":" Statement
+LabeledStmt     "labeled statement"             = Label COLON Statement
 Label           "label"                         = identifier
 
 // # Expression statements ================
@@ -369,22 +369,22 @@ ExpressionStmt  "expression statement"          = Expression
 
 // # Send statements ======================
 
-SendStmt        "send-statement"                = Channel "<-" Expression
+SendStmt        "send-statement"                = Channel ARROW Expression
 Channel         "channel"                       = Expression
 
 // # IncDec statements ====================
 
-IncDecStmt      "increment/decrement statement" = Expression ( "++" / "--" )
+IncDecStmt      "increment/decrement statement" = Expression ( INC / DEC )
 
 // # Assignments ==========================
 
 Assignment      "assignment"                    = ExpressionList assign_op ExpressionList
 
-assign_op       "assignment operator"           = ( add_op / mul_op )? "="
+assign_op       "assignment operator"           = ( add_op / mul_op )? EQUAL
 
 // # 'if' statements ======================
 
-IfStmt  "'if' statement"  = "if" ( SimpleStmt ";" )? Expression Block ( "else" ( IfStmt / Block ) )?
+IfStmt  "'if' statement"  = "if" ( SimpleStmt SEMICOLON )? Expression Block ( "else" ( IfStmt / Block ) )?
 
 // # 'switch' statements ==================
 
@@ -393,20 +393,20 @@ SwitchStmt      "'switch' statement"            = ExprSwitchStmt
 
 // # Expression switches ------------------
 
-ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt ";" )? ( Expression )? "{" ( ExprCaseClause )* "}"
-ExprCaseClause  "expression of 'case' clause"       = ExprSwitchCase ":" StatementList
+ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt SEMICOLON )? ( Expression )? LBRACE ( ExprCaseClause )* RBRACE
+ExprCaseClause  "expression of 'case' clause"       = ExprSwitchCase COLON StatementList
 ExprSwitchCase  "expression of switch's 'case'"     = "case" ExpressionList
                                                     / "default"
 
 // # Type switches -------------------------
 
-TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt ";" )? TypeSwitchGuard "{" ( TypeCaseClause )* "}"
-TypeSwitchGuard "type-switch guard"             = ( identifier ":=" ) PrimaryExpr "." "(" "type" ")"
-TypeCaseClause  "type-switch clause"            = TypeSwitchCase ":" StatementList
+TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt SEMICOLON )? TypeSwitchGuard LBRACE ( TypeCaseClause )* RBRACE
+TypeSwitchGuard "type-switch guard"             = ( identifier DEFINE ) PrimaryExpr DOT LPAREN "type" RPAREN
+TypeCaseClause  "type-switch clause"            = TypeSwitchCase COLON StatementList
 TypeSwitchCase  "type-switch case"              = "case" TypeList
                                                 / "default"
 
-TypeList        "type list"                     = Type ( "," Type )*
+TypeList        "type list"                     = Type ( COMMA Type )*
 
 // # 'for' statements ======================
 
@@ -415,13 +415,13 @@ Condition       "'for' condition"               = Expression
 
 // # 'for' statements with 'for' clause ----
 
-ForClause       "'for' clause"                  = ( InitStmt )? ";" ( Condition )? ";" ( PostStmt )?
+ForClause       "'for' clause"                  = ( InitStmt )? SEMICOLON ( Condition )? SEMICOLON ( PostStmt )?
 InitStmt        "initial statament in 'for'"    = SimpleStmt
 PostStmt        "post statement in 'for'"       = SimpleStmt
 
 // # 'for' statements with 'range' clause --
 
-RangeClause     "'range' clause"                = ( ExpressionList "=" / IdentifierList ":=" )? "range" Expression
+RangeClause     "'range' clause"                = ( ExpressionList EQUAL / IdentifierList DEFINE )? "range" Expression
 
 // # 'go' statements =======================
 
@@ -429,12 +429,12 @@ GoStmt          "'go' statement"                = "go" Expression
 
 // # 'select' statements ===================
 
-SelectStmt      "'select' statement"            = "select" "{" ( CommClause )* "}"
-CommClause      "communication-clause"          = CommCase ":" StatementList
+SelectStmt      "'select' statement"            = "select" LBRACE ( CommClause )* RBRACE
+CommClause      "communication-clause"          = CommCase COLON StatementList
 CommCase        "comminucation 'case'"          = "case" ( SendStmt / RecvStmt )
                                                 / "default"
 
-RecvStmt        "receive-statement"             = ( ExpressionList "=" / IdentifierList ":=" )? RecvExpr
+RecvStmt        "receive-statement"             = ( ExpressionList EQUAL / IdentifierList DEFINE )? RecvExpr
 RecvExpr        "receive-expression"            = Expression
 
 // # 'return' statements ===================
@@ -463,7 +463,7 @@ DeferStmt       "'defer' statement"             = "defer" Expression
 
 // # Source file organization ==============
 
-SourceFile      "source file organization"      = PackageClause ";" ( ImportDecl ";" )* ( TopLevelDecl ";" )*
+SourceFile      "source file organization"      = PackageClause SEMICOLON ( ImportDecl SEMICOLON )* ( TopLevelDecl SEMICOLON )*
 
 // # 'package' clause ======================
 
@@ -472,8 +472,8 @@ PackageName     "package name"                  = identifier
 
 // # 'import' declarations =================
 
-ImportDecl      "'import' declaration"          = "import" ( ImportSpec / "(" ( ImportSpec ";" )* ")" )
-ImportSpec      "import specification"          = ( "." / PackageName )? ImportPath
+ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec SEMICOLON )* RPAREN )
+ImportSpec      "import specification"          = ( DOT / PackageName )? ImportPath
 ImportPath      "import path"                   = string_lit
 
 
@@ -498,8 +498,9 @@ RBRACE            "right brace"                 = '}'
 
 PLUS              "plus"                        = '+'
 MINUS             "minus"                       = '-'
-ASTERISK          "asterisk"                    = '*'
+
 SLASH             "slash"                       = '/'
+BSLASH            "backslash"                   = [U+005C]        // \
 
 EQUAL             "equal"                       = '='
 LSS               "less than"                   = '<'
@@ -507,9 +508,11 @@ GTR               "greater than"                = '>'
 
 AMPER             "ampersand"                   = '&'
 BANG              "bang"                        = '!'
+// QUESTION          "question"                    = '?'
 HAT               "hat"                         = '^'
 PERCENT           "percent"                     = '%'
 BAR               "bar"                         = '|'
+UBAR              "underbar"                    = '_'
 
 DQUO              "double quote"                = [U+0022]        // "
 SQUO              "single quote"                = [U+0027]        // '
@@ -538,6 +541,8 @@ AND               "bit: AND"                    = AMPER           // '&'
 OR                "bit: OR"                     = BAR             // '|'
 XOR               "bit: XOR"                    = HAT             // '^'
 AND_NOT           "bit: AND NOT"                = AMPER HAT       // '&^'
+
+NEG               "unary bit negation"          = HAT             // '^'
 
 SHL               "bit: shift left"             = LSS LSS         // '<<'
 SHR               "bit: shift right"            = GTR GTR         // '>>'
@@ -569,6 +574,9 @@ AND_NOT_ASSIGN    "assign: logical AND NOT"     = AMPER HAT EQUAL // '&^='
 
 SHL_ASSIGN        "assign: shift left"          = LSS LSS EQUAL   // '<<='
 SHR_ASSIGN        "assign: shift right"         = GTR GTR EQUAL   // '>>='
+
+ADDR              "address"                     = AMPER           // '&'
+REFR              "resolve reference"           = ASTERISK        // '*'
 
 // # Keywords ===============================
 // via https://github.com/golang/go/src/go/token/token.go
