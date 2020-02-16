@@ -1,5 +1,16 @@
 {
-package go_parser
+  // main() is just to build and test
+  func main() {
+    if len(os.Args) != 2 {
+      log.Fatal("Usage: go_parser 'EXPR'")
+      return
+    }
+    got, err := ParseReader("", strings.NewReader(os.Args[1]))
+    if err != nil {
+      log.Fatal(err)
+    }
+    fmt.Println("=", got)
+  }
 }
 
 
