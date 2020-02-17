@@ -19,11 +19,13 @@ Input             "input to parser"             = SourceFile
 TERMINATOR        "terminator of line"          = SEMICOLON
                                                 / newline
 
+EOF               "end of file"                 = !.
+
 // # The followings are based on the scraped EBNF ###################################
 
 // # Source file organization ==============
 
-SourceFile      "source file organization"      = PackageClause TERMINATOR ( ImportDecl TERMINATOR )* ( TopLevelDecl TERMINATOR )*
+SourceFile      "source file organization"      = PackageClause TERMINATOR ( ImportDecl TERMINATOR )* ( TopLevelDecl TERMINATOR )* EOF
 
 // # 'package' clause ======================
 
