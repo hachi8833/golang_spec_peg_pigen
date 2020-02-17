@@ -13,8 +13,25 @@
   }
 }
 
+// "Input" is a special definition
+Input             "input to parser"            = SourceFile
 
 // # The followings are based on the scraped EBNF ###################################
+
+// # Source file organization ==============
+
+SourceFile      "source file organization"      = PackageClause SEMICOLON ( ImportDecl SEMICOLON )* ( TopLevelDecl SEMICOLON )*
+
+// # 'package' clause ======================
+
+PackageClause   "'package' clause"              = "package" PackageName
+PackageName     "package name"                  = identifier
+
+// # 'import' declarations =================
+
+ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec SEMICOLON )* RPAREN )
+ImportSpec      "import specification"          = ( DOT / PackageName )? ImportPath
+ImportPath      "import path"                   = string_lit
 
 // # Characters =============================
 
@@ -482,22 +499,6 @@ FallthroughStmt "'fallthrough' statement"       = "fallthrough"
 // # 'defer' statements ====================
 
 DeferStmt       "'defer' statement"             = "defer" Expression
-
-// # Source file organization ==============
-
-SourceFile      "source file organization"      = PackageClause SEMICOLON ( ImportDecl SEMICOLON )* ( TopLevelDecl SEMICOLON )*
-
-// # 'package' clause ======================
-
-PackageClause   "'package' clause"              = "package" PackageName
-PackageName     "package name"                  = identifier
-
-// # 'import' declarations =================
-
-ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec SEMICOLON )* RPAREN )
-ImportSpec      "import specification"          = ( DOT / PackageName )? ImportPath
-ImportPath      "import path"                   = string_lit
-
 
 // # Operators and delimiters ##################################################
 // via https://github.com/golang/go/src/go/token/token.go
