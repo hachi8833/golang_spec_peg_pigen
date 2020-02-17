@@ -14,13 +14,16 @@
 }
 
 // "Input" is a special definition
-Input             "input to parser"            = SourceFile
+Input             "input to parser"             = SourceFile
+
+TERMINATOR        "terminator of line"          = SEMICOLON
+                                                / newline
 
 // # The followings are based on the scraped EBNF ###################################
 
 // # Source file organization ==============
 
-SourceFile      "source file organization"      = PackageClause SEMICOLON ( ImportDecl SEMICOLON )* ( TopLevelDecl SEMICOLON )*
+SourceFile      "source file organization"      = PackageClause TERMINATOR ( ImportDecl TERMINATOR )* ( TopLevelDecl TERMINATOR )*
 
 // # 'package' clause ======================
 
@@ -29,7 +32,7 @@ PackageName     "package name"                  = identifier
 
 // # 'import' declarations =================
 
-ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec SEMICOLON )* RPAREN )
+ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec TERMINATOR )* RPAREN )
 ImportSpec      "import specification"          = ( DOT / PackageName )? ImportPath
 ImportPath      "import path"                   = string_lit
 
@@ -148,7 +151,7 @@ SliceType       "slice type"                    = LBRACK RBRACK ElementType
 
 // # Struct types ---------------------------
 
-StructType      "struct type"                   = "struct" LBRACE ( FieldDecl SEMICOLON )* RBRACE
+StructType      "struct type"                   = "struct" LBRACE ( FieldDecl TERMINATOR )* RBRACE
 FieldDecl       "struct field declaration"      = (IdentifierList Type / EmbeddedField) ( Tag )?
 EmbeddedField   "struct embedded field"         = ( ASTERISK )? TypeName
 Tag             "struct tag"                    = string_lit
@@ -170,7 +173,7 @@ ParameterDecl   "function parameter declaration"  = ( IdentifierList )? ( ELLIPS
 
 // # Interface types ------------------------
 
-InterfaceType      "interface type"             = "interface" LBRACE ( MethodSpec SEMICOLON )? RBRACE
+InterfaceType      "interface type"             = "interface" LBRACE ( MethodSpec TERMINATOR )? RBRACE
 MethodSpec         "method specification"       = MethodName Signature
                                                 / InterfaceTypeName
 
@@ -189,7 +192,7 @@ ChannelType     "channel type"                  = ( "chan" / "chan" ARROW / ARRO
 // # Blocks =================================
 
 Block           "block"                         = LBRACE StatementList RBRACE
-StatementList   "statement list"                = ( Statement SEMICOLON )*
+StatementList   "statement list"                = ( Statement TERMINATOR )*
 
 // # Declarations and scope =================
 
@@ -203,7 +206,7 @@ TopLevelDecl    "top-level declaration"         = Declaration
 
 // # Constant declarations ==================
 
-ConstDecl       "constant declaration"          = "const" ( ConstSpec / LPAREN ( ConstSpec SEMICOLON )* RPAREN )
+ConstDecl       "constant declaration"          = "const" ( ConstSpec / LPAREN ( ConstSpec TERMINATOR )* RPAREN )
 ConstSpec       "constant specification"        = IdentifierList ( ( Type )? EQUAL ExpressionList )?
 
 IdentifierList  "identifier list"               = identifier ( COMMA identifier )*
@@ -211,7 +214,7 @@ ExpressionList  "expression list"               = Expression ( COMMA Expression 
 
 // # Type declarations ======================
 
-TypeDecl        "type declaration"              = "type" ( TypeSpec / LPAREN ( TypeSpec SEMICOLON )? RPAREN )
+TypeDecl        "type declaration"              = "type" ( TypeSpec / LPAREN ( TypeSpec TERMINATOR )? RPAREN )
 TypeSpec        "type specification"            = AliasDecl
                                                 / TypeDef
 
@@ -225,7 +228,7 @@ TypeDef         "type definition"               = identifier Type
 
 // # Variable declarations ==================
 
-VarDecl         "variable declaration"          = "var" ( VarSpec / LPAREN ( VarSpec SEMICOLON )* RPAREN )
+VarDecl         "variable declaration"          = "var" ( VarSpec / LPAREN ( VarSpec TERMINATOR )* RPAREN )
 VarSpec         "variabpe specification"        = IdentifierList ( Type ( EQUAL ExpressionList )* / EQUAL ExpressionList )
 
 // # Short variable declarations ============
@@ -423,7 +426,7 @@ assign_op       "assignment operator"           = ( add_op / mul_op )? EQUAL
 
 // # 'if' statements ======================
 
-IfStmt  "'if' statement"  = "if" ( SimpleStmt SEMICOLON )? Expression Block ( "else" ( IfStmt / Block ) )?
+IfStmt  "'if' statement"  = "if" ( SimpleStmt TERMINATOR )? Expression Block ( "else" ( IfStmt / Block ) )?
 
 // # 'switch' statements ==================
 
@@ -432,14 +435,14 @@ SwitchStmt      "'switch' statement"            = ExprSwitchStmt
 
 // # Expression switches ------------------
 
-ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt SEMICOLON )? ( Expression )? LBRACE ( ExprCaseClause )* RBRACE
+ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt TERMINATOR )? ( Expression )? LBRACE ( ExprCaseClause )* RBRACE
 ExprCaseClause  "expression of 'case' clause"       = ExprSwitchCase COLON StatementList
 ExprSwitchCase  "expression of switch's 'case'"     = "case" ExpressionList
                                                     / "default"
 
 // # Type switches -------------------------
 
-TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt SEMICOLON )? TypeSwitchGuard LBRACE ( TypeCaseClause )* RBRACE
+TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt TERMINATOR )? TypeSwitchGuard LBRACE ( TypeCaseClause )* RBRACE
 TypeSwitchGuard "type-switch guard"             = ( identifier DEFINE ) PrimaryExpr DOT LPAREN "type" RPAREN
 TypeCaseClause  "type-switch clause"            = TypeSwitchCase COLON StatementList
 TypeSwitchCase  "type-switch case"              = "case" TypeList
@@ -454,7 +457,7 @@ Condition       "'for' condition"               = Expression
 
 // # 'for' statements with 'for' clause ----
 
-ForClause       "'for' clause"                  = ( InitStmt )? SEMICOLON ( Condition )? SEMICOLON ( PostStmt )?
+ForClause       "'for' clause"                  = ( InitStmt )? TERMINATOR ( Condition )? TERMINATOR ( PostStmt )?
 InitStmt        "initial statament in 'for'"    = SimpleStmt
 PostStmt        "post statement in 'for'"       = SimpleStmt
 
