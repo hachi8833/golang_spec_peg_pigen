@@ -15,7 +15,7 @@
 
 SourceFile        "source file organization"    = PackageClause
 
-PackageClause     "'package' clause"            = "package" PackageName
+PackageClause     "'package' clause"            = PACKAGE PackageName
 PackageName       "package name"                = identifier
 
 
@@ -34,9 +34,11 @@ binary_digit      "binary digit"                = "0" / "1"
 octal_digit       "octal digit"                 = [0-7]
 hex_digit         "hexadecimal digit"           = [0-9] / [A-F]i / [a-f]i
 
+letter_digit      "letter or diigit"            = letter ( letter / decimal_digit )+
+
 // # Identifiers ============================
 
-identifier        "identifier"                  = !Keyword BD letter ( letter / unicode_digit )* BD
+identifier        "identifier"                  = !Keyword letter_digit
 
 // # primitive signs -----------------------
 
@@ -72,9 +74,9 @@ PERCENT           "percent"                     = '%'
 BAR               "bar"                         = '|'
 UBAR              "underbar"                    = '_'
 
-DQUO              "double quote"                = [U+0022]        // "
-SQUO              "single quote"                = [U+0027]        // '
-BQUO              "back quote/grave accent"     = [U+0060]        // `
+DQUO              "double quote"                = [U+0022]        // ""
+SQUO              "single quote"                = [U+0027]        // ''
+BQUO              "back quote/grave accent"     = [U+0060]        // ``
 
 LF                "line feed"                   = [U+000A]
 // CR                "carriage return"             = [U+000D]
@@ -93,7 +95,7 @@ ADD               "add"                         = PLUS            // '+'
 SUB               "subtract"                    = MINUS           // '-'
 MUL               "multiply"                    = ASTERISK        // '*'
 QUO               "quotient"                    = SLASH           // '/'
-REM               "remainder"                   = PERCENT         // '%
+REM               "remainder"                   = PERCENT         // '%'
 
 AND               "bit: AND"                    = AMPER           // '&'
 OR                "bit: OR"                     = BAR             // '|'
@@ -151,7 +153,38 @@ EOF               "end-of-file"                 = !.
 // # Keywords ===============================
 // via https://github.com/golang/go/src/go/token/token.go
 
-Keyword           "keyword"                     = "break"
+BREAK                                           = "break"       !letter_digit BD
+CASE                                            = "case"        !letter_digit BD
+CHAN                                            = "chan"        !letter_digit BD
+CONST                                           = "const"       !letter_digit BD
+CONTINUE                                        = "continue"    !letter_digit BD
+
+DEFAULT                                         = "default"     !letter_digit BD
+DEFER                                           = "defer"       !letter_digit BD
+ELSE                                            = "else"        !letter_digit BD
+FALLTHROUGH                                     = "fallthrough" !letter_digit BD
+FOR                                             = "for"         !letter_digit BD
+
+FUNC                                            = "func"        !letter_digit BD
+GO                                              = "go"          !letter_digit BD
+GOTO                                            = "goto"        !letter_digit BD
+IF                                              = "if"          !letter_digit BD
+IMPORT
+
+INTERFACE                                       = "interface"   !letter_digit BD
+MAP                                             = "map"         !letter_digit BD
+PACKAGE                                         = "package"     !letter_digit BD
+RANGE                                           = "range"       !letter_digit BD
+RETURN                                          = "return"      !letter_digit BD
+
+SELECT                                          = "select"      !letter_digit BD
+STRUCT                                          = "struct"      !letter_digit BD
+SWITCH                                          = "switch"      !letter_digit BD
+TYPE                                            = "type"        !letter_digit BD
+VAR                                             = "var"         !letter_digit BD
+
+Keyword           "keyword"                     = (
+                                                  "break"
                                                 / "case"
                                                 / "chan"
                                                 / "const"
@@ -180,3 +213,4 @@ Keyword           "keyword"                     = "break"
                                                 / "switch"
                                                 / "type"
                                                 / "var"
+                                                ) !letter_digit

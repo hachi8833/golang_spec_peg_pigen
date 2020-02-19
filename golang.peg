@@ -535,9 +535,9 @@ PERCENT           "percent"                     = '%'
 BAR               "bar"                         = '|'
 UBAR              "underbar"                    = '_'
 
-DQUO              "double quote"                = [U+0022]        // "
-SQUO              "single quote"                = [U+0027]        // '
-BQUO              "back quote/grave accent"     = [U+0060]        // `
+DQUO              "double quote"                = [U+0022]        // ""
+SQUO              "single quote"                = [U+0027]        // ''
+BQUO              "back quote/grave accent"     = [U+0060]        // ``
 
 LF                "line feed"                   = [U+000A]
 // CR                "carriage return"             = [U+000D]
@@ -556,7 +556,7 @@ ADD               "add"                         = PLUS            // '+'
 SUB               "subtract"                    = MINUS           // '-'
 MUL               "multiply"                    = ASTERISK        // '*'
 QUO               "quotient"                    = SLASH           // '/'
-REM               "remainder"                   = PERCENT         // '%
+REM               "remainder"                   = PERCENT         // '%'
 
 AND               "bit: AND"                    = AMPER           // '&'
 OR                "bit: OR"                     = BAR             // '|'
