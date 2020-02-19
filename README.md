@@ -1,5 +1,7 @@
 # Golang Specification in PEG (Pigeon) format
 
+Just a proof of concept.
+
 The [golang_peg.go](golang_peg.go) file on the repository, written in PEG (Pigeon) format, is based on the following:
 
 * Official: [Golang specification](https://golang.org/ref/spec)

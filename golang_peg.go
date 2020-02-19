@@ -1,4 +1,5 @@
 {
+  import "github.com/k0kubun/pp"
   // main() is just to build and test
   func main() {
     if len(os.Args) != 2 {
@@ -9,34 +10,26 @@
     if err != nil {
       log.Fatal(err)
     }
-    fmt.Println("=", got)
+    pp.Println("=", got)
   }
 }
-
-// "Input" is a special definition
-Input             "input to parser"             = SourceFile
-
-TERMINATOR        "terminator of line"          = SEMICOLON
-                                                / newline
-
-EOF               "end of file"                 = !.
 
 // # The followings are based on the scraped EBNF ###################################
 
 // # Source file organization ==============
 
-SourceFile      "source file organization"      = PackageClause TERMINATOR ( ImportDecl TERMINATOR )* ( TopLevelDecl TERMINATOR )* EOF
+SourceFile        "source file organization"    = PackageClause BD ( ImportDecl BD )* ( TopLevelDecl BD )* EOF
 
 // # 'package' clause ======================
 
-PackageClause   "'package' clause"              = "package" PackageName
-PackageName     "package name"                  = identifier
+PackageClause     "'package' clause"            = "package" PackageName
+PackageName       "package name"                = identifier
 
 // # 'import' declarations =================
 
-ImportDecl      "'import' declaration"          = "import" ( ImportSpec / LPAREN ( ImportSpec TERMINATOR )* RPAREN )
-ImportSpec      "import specification"          = ( DOT / PackageName )? ImportPath
-ImportPath      "import path"                   = string_lit
+ImportDecl        "'import' declaration"        = "import" ( ImportSpec / LPAREN ( ImportSpec BD )* RPAREN )
+ImportSpec        "import specification"        = ( DOT / PackageName )? ImportPath
+ImportPath        "import path"                 = string_lit
 
 // # Characters =============================
 
@@ -153,7 +146,7 @@ SliceType       "slice type"                    = LBRACK RBRACK ElementType
 
 // # Struct types ---------------------------
 
-StructType      "struct type"                   = "struct" LBRACE ( FieldDecl TERMINATOR )* RBRACE
+StructType      "struct type"                   = "struct" LBRACE ( FieldDecl BD )* RBRACE
 FieldDecl       "struct field declaration"      = (IdentifierList Type / EmbeddedField) ( Tag )?
 EmbeddedField   "struct embedded field"         = ( ASTERISK )? TypeName
 Tag             "struct tag"                    = string_lit
@@ -175,7 +168,7 @@ ParameterDecl   "function parameter declaration"  = ( IdentifierList )? ( ELLIPS
 
 // # Interface types ------------------------
 
-InterfaceType      "interface type"             = "interface" LBRACE ( MethodSpec TERMINATOR )? RBRACE
+InterfaceType      "interface type"             = "interface" LBRACE ( MethodSpec BD )? RBRACE
 MethodSpec         "method specification"       = MethodName Signature
                                                 / InterfaceTypeName
 
@@ -194,7 +187,7 @@ ChannelType     "channel type"                  = ( "chan" / "chan" ARROW / ARRO
 // # Blocks =================================
 
 Block           "block"                         = LBRACE StatementList RBRACE
-StatementList   "statement list"                = ( Statement TERMINATOR )*
+StatementList   "statement list"                = ( Statement BD )*
 
 // # Declarations and scope =================
 
@@ -208,7 +201,7 @@ TopLevelDecl    "top-level declaration"         = Declaration
 
 // # Constant declarations ==================
 
-ConstDecl       "constant declaration"          = "const" ( ConstSpec / LPAREN ( ConstSpec TERMINATOR )* RPAREN )
+ConstDecl       "constant declaration"          = "const" ( ConstSpec / LPAREN ( ConstSpec BD )* RPAREN )
 ConstSpec       "constant specification"        = IdentifierList ( ( Type )? EQUAL ExpressionList )?
 
 IdentifierList  "identifier list"               = identifier ( COMMA identifier )*
@@ -216,7 +209,7 @@ ExpressionList  "expression list"               = Expression ( COMMA Expression 
 
 // # Type declarations ======================
 
-TypeDecl        "type declaration"              = "type" ( TypeSpec / LPAREN ( TypeSpec TERMINATOR )? RPAREN )
+TypeDecl        "type declaration"              = "type" ( TypeSpec / LPAREN ( TypeSpec BD )? RPAREN )
 TypeSpec        "type specification"            = AliasDecl
                                                 / TypeDef
 
@@ -230,7 +223,7 @@ TypeDef         "type definition"               = identifier Type
 
 // # Variable declarations ==================
 
-VarDecl         "variable declaration"          = "var" ( VarSpec / LPAREN ( VarSpec TERMINATOR )* RPAREN )
+VarDecl         "variable declaration"          = "var" ( VarSpec / LPAREN ( VarSpec BD )* RPAREN )
 VarSpec         "variabpe specification"        = IdentifierList ( Type ( EQUAL ExpressionList )* / EQUAL ExpressionList )
 
 // # Short variable declarations ============
@@ -428,7 +421,7 @@ assign_op       "assignment operator"           = ( add_op / mul_op )? EQUAL
 
 // # 'if' statements ======================
 
-IfStmt  "'if' statement"  = "if" ( SimpleStmt TERMINATOR )? Expression Block ( "else" ( IfStmt / Block ) )?
+IfStmt  "'if' statement"  = "if" ( SimpleStmt BD )? Expression Block ( "else" ( IfStmt / Block ) )?
 
 // # 'switch' statements ==================
 
@@ -437,14 +430,14 @@ SwitchStmt      "'switch' statement"            = ExprSwitchStmt
 
 // # Expression switches ------------------
 
-ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt TERMINATOR )? ( Expression )? LBRACE ( ExprCaseClause )* RBRACE
+ExprSwitchStmt  "expression of 'switch' statement"  = "switch" ( SimpleStmt BD )? ( Expression )? LBRACE ( ExprCaseClause )* RBRACE
 ExprCaseClause  "expression of 'case' clause"       = ExprSwitchCase COLON StatementList
 ExprSwitchCase  "expression of switch's 'case'"     = "case" ExpressionList
                                                     / "default"
 
 // # Type switches -------------------------
 
-TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt TERMINATOR )? TypeSwitchGuard LBRACE ( TypeCaseClause )* RBRACE
+TypeSwitchStmt  "type-switch statement"         = "switch" ( SimpleStmt BD )? TypeSwitchGuard LBRACE ( TypeCaseClause )* RBRACE
 TypeSwitchGuard "type-switch guard"             = ( identifier DEFINE ) PrimaryExpr DOT LPAREN "type" RPAREN
 TypeCaseClause  "type-switch clause"            = TypeSwitchCase COLON StatementList
 TypeSwitchCase  "type-switch case"              = "case" TypeList
@@ -459,7 +452,7 @@ Condition       "'for' condition"               = Expression
 
 // # 'for' statements with 'for' clause ----
 
-ForClause       "'for' clause"                  = ( InitStmt )? TERMINATOR ( Condition )? TERMINATOR ( PostStmt )?
+ForClause       "'for' clause"                  = ( InitStmt )? BD ( Condition )? BD ( PostStmt )?
 InitStmt        "initial statament in 'for'"    = SimpleStmt
 PostStmt        "post statement in 'for'"       = SimpleStmt
 
@@ -606,6 +599,15 @@ SHR_ASSIGN        "assign: shift right"         = GTR GTR EQUAL   // '>>='
 ADDR              "address"                     = AMPER           // '&'
 REFR              "resolve reference"           = ASTERISK        // '*'
 
+SPC               "spaces to be ignored"        = ( WHITESPACE / COMMENT_MULTI / COMMENT_LINE )*
+
+WHITESPACE        "white space"                 = [\n \t\r]+
+COMMENT_MULTI     "multiline-comment"           = "/*" ( !"*/" . )* "*/"
+COMMENT_LINE      "end-of-line comment"         = "//" ( ![\r\n] . )* [\r\n]
+
+BD               "boundary terminator"         = WHITESPACE
+                                                / SEMICOLON
+
 // # Keywords ===============================
 // via https://github.com/golang/go/src/go/token/token.go
 
@@ -638,3 +640,5 @@ Keyword           "keyword"                     = "break"
                                                 / "switch"
                                                 / "type"
                                                 / "var"
+
+EOF             "end-of-file"                   = !.
