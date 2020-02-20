@@ -13,11 +13,18 @@
   }
 }
 
-SourceFile        "source file organization"    = PackageClause
+SourceFile        "source file organization"    = PackageClause EOF
+
+// # 'package' clause ======================
 
 PackageClause     "'package' clause"            = PACKAGE PackageName
 PackageName       "package name"                = identifier
 
+// # 'import' declarations =================
+
+ImportDecl        "'import' declaration"        = IMPORT ( ImportSpec / LPAREN ( ImportSpec BD )* RPAREN )
+ImportSpec        "import specification"        = ( DOT / PackageName )? ImportPath
+ImportPath        "import path"                 = string_lit
 
 // # Characters =============================
 
@@ -40,6 +47,72 @@ letter_digit      "letter or diigit"            = letter ( letter / decimal_digi
 
 identifier        "identifier"                  = !Keyword letter_digit
 
+// # Integer literals =======================
+
+int_lit           "integer literal"             = decimal_lit
+                                                / binary_lit
+                                                / octal_lit
+                                                / hex_lit
+
+decimal_lit       "decimal literal"             = "0" / ( [1-9] ) ( ( UBAR )? decimal_digits )?
+binary_lit        "binary literal"              = "0" ( "b" / "B" ) ( UBAR )? binary_digits
+octal_lit         "octal literal"               = "0" ( "o" / "O" ) ( UBAR )? octal_digits
+hex_lit           "hexadecimal literal"         = "0" ( "x" / "X" ) ( UBAR )? hex_digits
+
+decimal_digits    "decimal digits"              = decimal_digit ( ( UBAR )? decimal_digit )*
+binary_digits     "binary digits"               = binary_digit ( ( UBAR )? binary_digit )*
+octal_digits      "octal digits"                = octal_digit ( ( UBAR )? octal_digit )*
+hex_digits        "hexadecimal digits"          = hex_digit ( ( UBAR ) hex_digit )*
+
+// # Floating-point literals ================
+
+float_lit         "float literal"               = decimal_float_lit
+                                                / hex_float_lit
+
+decimal_float_lit "decimal float literal"       = decimal_digits DOT ( decimal_digits )? ( decimal_exponent )?
+                                                / decimal_digits decimal_exponent
+                                                / DOT decimal_digits ( decimal_exponent )?
+
+decimal_exponent  "decimal exponent"            = ( "e" / "E" ) ( PLUS / MINUS )? decimal_digits
+
+hex_float_lit     "hexadecimal float literal"   = "0" ( "x" / "X" ) hex_mantissa hex_exponent
+hex_mantissa      "hexadecimal mantissa"        = ( UBAR )? hex_digits DOT ( hex_digits )?
+                                                / ( UBAR )? hex_digits
+                                                / DOT hex_digits
+
+hex_exponent      "hexadecimal exponent"        = ( "p" / "P" ) ( PLUS / MINUS )? decimal_digits
+
+// # Imaginary literals =====================
+
+imaginary_lit    "imaginary literal"            = (decimal_digits / int_lit / float_lit) "i"
+
+// # Rune literals ==========================
+
+rune_lit         "rune literal"                 = SQUO ( unicode_value / byte_value ) SQUO
+unicode_value    "unicode value"                = unicode_char
+                                                / little_u_value
+                                                / big_u_value
+                                                / escaped_char
+
+byte_value       "byte value"                   = octal_byte_value
+                                                / hex_byte_value
+
+octal_byte_value "octal byte value"             = BQUO octal_digit octal_digit octal_digit
+hex_byte_value   "hexadecimal byte value"       = BQUO "x"  hex_digit hex_digit
+little_u_value   "little u value"               = BQUO "u"  hex_digit hex_digit hex_digit hex_digit
+big_u_value      "big U value"                  = BQUO "U"  hex_digit hex_digit hex_digit hex_digit
+                                                            hex_digit hex_digit hex_digit hex_digit
+
+escaped_char     "rune escaped char"            = BSLASH ( "a" / "b" / "f" / "n" / "r" / "t" / "v" / BSLASH / SQUO / DQUO )
+
+// # String literals ========================
+
+string_lit             "string literal"             = raw_string_lit
+                                                    / interpreted_string_lit
+
+raw_string_lit         "raw string literal"         = BQUO ( unicode_char / newline )* BQUO
+interpreted_string_lit "interpreted string literal" = DQUO ( unicode_value / byte_value )* DQUO
+
 // # primitive signs -----------------------
 
 SEMICOLON         "semicolon"                   = ';'
@@ -60,7 +133,7 @@ PLUS              "plus"                        = '+'
 MINUS             "minus"                       = '-'
 
 SLASH             "slash"                       = '/'
-BSLASH            "backslash"                   = [U+005C]        // \
+BSLASH            "backslash"                   = [\\]
 
 EQUAL             "equal"                       = '='
 LSS               "less than"                   = '<'
@@ -74,14 +147,14 @@ PERCENT           "percent"                     = '%'
 BAR               "bar"                         = '|'
 UBAR              "underbar"                    = '_'
 
-DQUO              "double quote"                = [U+0022]        // ""
-SQUO              "single quote"                = [U+0027]        // ''
-BQUO              "back quote/grave accent"     = [U+0060]        // ``
+DQUO              "double quote"                = ["]
+SQUO              "single quote"                = [']
+BQUO              "back quote/grave accent"     = [`]
 
-LF                "line feed"                   = [U+000A]
-// CR                "carriage return"             = [U+000D]
-// TAB               "horizontal tab"              = [U+0009]
-// SPACE             "white space"                 = [U+0020]
+LF                "line feed"                   = [\n]
+CR                "carriage return"             = [\r]
+TAB               "horizontal tab"              = [\t]
+SPC               "space"                       = [ ]
 
 // AT                "atmark"                      = '@'
 // NUM               "number"                      = '#'
@@ -100,88 +173,99 @@ REM               "remainder"                   = PERCENT         // '%'
 AND               "bit: AND"                    = AMPER           // '&'
 OR                "bit: OR"                     = BAR             // '|'
 XOR               "bit: XOR"                    = HAT             // '^'
-AND_NOT           "bit: AND NOT"                = AMPER HAT       // '&^'
+AND_NOT           "bit: AND NOT"                = AMPER HAT       // "&^"
 
 NEG               "unary bit negation"          = HAT             // '^'
 
-SHL               "bit: shift left"             = LSS LSS         // '<<'
-SHR               "bit: shift right"            = GTR GTR         // '>>'
+SHL               "bit: shift left"             = LSS LSS         // "<<"
+SHR               "bit: shift right"            = GTR GTR         // ">>"
 
-LAND              "logical AND"                 = AMPER AMPER     // '&&'
-LOR               "logical OR"                  = BAR BAR         // '||'
-ARROW             "arrow"                       = LSS MINUS       // '<-'
-INC               "increment"                   = PLUS PLUS       // '++'
-DEC               "decrement"                   = MINUS MINUS     // '--'
+LAND              "logical AND"                 = AMPER AMPER     // "&&"
+LOR               "logical OR"                  = BAR BAR         // "||"
+ARROW             "arrow"                       = LSS MINUS       // "<-"
+INC               "increment"                   = PLUS PLUS       // "++"
+DEC               "decrement"                   = MINUS MINUS     // "--"
 
-EQL               "equal"                       = EQUAL EQUAL     // '=='
-NEQ               "not equal"                   = BANG EQUAL      // '!='
-LEQ               "less or equal"               = LSS EQUAL       // '<='
-GEQ               "greater or equal"            = GTR EQUAL       // '>='
-DEFINE            "define"                      = COLON EQUAL     // ':='
-ELLIPSIS          "ellipsis"                    = DOT DOT DOT     // '...'
+EQL               "equal"                       = EQUAL EQUAL     // "=="
+NEQ               "not equal"                   = BANG EQUAL      // "!="
+LEQ               "less or equal"               = LSS EQUAL       // "<="
+GEQ               "greater or equal"            = GTR EQUAL       // ">="
+DEFINE            "define"                      = COLON EQUAL     // ":="
+ELLIPSIS          "ellipsis"                    = DOT DOT DOT     // "..."
 
 ASSIGN            "assign"                      = EQUAL           // '='
-ADD_ASSIGN        "assign: add"                 = PLUS EQUAL      // '+='
-SUB_ASSIGN        "assign: subtract"            = MINUS EQUAL     // '-='
-MUL_ASSIGN        "assign: multiply"            = ASTERISK EQUAL  // '*='
-QUO_ASSIGN        "assign: quotient"            = SLASH EQUAL     // '/='
-REM_ASSIGN        "assign: remainder"           = PERCENT EQUAL   // '%='
+ADD_ASSIGN        "assign: add"                 = PLUS EQUAL      // "+="
+SUB_ASSIGN        "assign: subtract"            = MINUS EQUAL     // "-="
+MUL_ASSIGN        "assign: multiply"            = ASTERISK EQUAL  // "*="
+QUO_ASSIGN        "assign: quotient"            = SLASH EQUAL     // "/="
+REM_ASSIGN        "assign: remainder"           = PERCENT EQUAL   // "%="
 
-AND_ASSIGN        "assign: logical AND"         = AMPER EQUAL     // '&='
-OR_ASSIGN         "assign: logical OR"          = BAR EQUAL       // '|='
-XOR_ASSIGN        "assign: logical XOR"         = HAT EQUAL       // '^='
-AND_NOT_ASSIGN    "assign: logical AND NOT"     = AMPER HAT EQUAL // '&^='
+AND_ASSIGN        "assign: logical AND"         = AMPER EQUAL     // "&="
+OR_ASSIGN         "assign: logical OR"          = BAR EQUAL       // "|="
+XOR_ASSIGN        "assign: logical XOR"         = HAT EQUAL       // "^="
+AND_NOT_ASSIGN    "assign: logical AND NOT"     = AMPER HAT EQUAL // "&^="
 
-SHL_ASSIGN        "assign: shift left"          = LSS LSS EQUAL   // '<<='
-SHR_ASSIGN        "assign: shift right"         = GTR GTR EQUAL   // '>>='
+SHL_ASSIGN        "assign: shift left"          = LSS LSS EQUAL   // "<<="
+SHR_ASSIGN        "assign: shift right"         = GTR GTR EQUAL   // ">>="
 
 ADDR              "address"                     = AMPER           // '&'
 REFR              "resolve reference"           = ASTERISK        // '*'
 
-COMMENT_MULTI     "multiline-comment"           = "/*" ( !"*/" . )* "*/"
-COMMENT_LINE      "end-of-line comment"         = "//" ( ![\r\n] . )* [\r\n]
+CMST              "comment start"               = SLASH ASTERISK  // "/*"
+CMED              "comment end"                 = ASTERISK SLASH  // "*/"
+CMLN              "comment line"                = SLASH SLASH     // "//"
 
-SPC               "space character"             = ([ ])+
-WHITESPACE        "white space"                 = [\n \t\r]+
-WSP               "spaces to be ignored"        = ( WHITESPACE / COMMENT_MULTI / COMMENT_LINE )*
+LFCR              "linefeed, carriage return"   = LF
+                                                / CR
 
-BD                "boundary"                    = WSP
+COMMENT_MULTI     "multiline-comment"           = CMST ( !CMED . )* CMED
+COMMENT_LINE      "end-of-line comment"         = CMLN ( !LFCR . )* LFCR
+
+WHITESPACE        "white space"                 = (
+                                                  SPC
+                                                / LFCR
+                                                / TAB
+                                                )+
+
+BD                "boundary"                    = WHITESPACE
                                                 / SEMICOLON
+                                                / COMMENT_MULTI
+                                                / COMMENT_LINE
 
 EOF               "end-of-file"                 = !.
 
 // # Keywords ===============================
 // via https://github.com/golang/go/src/go/token/token.go
 
-BREAK                                           = "break"       !letter_digit BD
-CASE                                            = "case"        !letter_digit BD
-CHAN                                            = "chan"        !letter_digit BD
-CONST                                           = "const"       !letter_digit BD
-CONTINUE                                        = "continue"    !letter_digit BD
+BREAK                                           = "break"       !letter_digit SPC+
+CASE                                            = "case"        !letter_digit SPC+
+CHAN                                            = "chan"        !letter_digit SPC+
+CONST                                           = "const"       !letter_digit SPC+
+CONTINUE                                        = "continue"    !letter_digit SPC+
 
-DEFAULT                                         = "default"     !letter_digit BD
-DEFER                                           = "defer"       !letter_digit BD
-ELSE                                            = "else"        !letter_digit BD
-FALLTHROUGH                                     = "fallthrough" !letter_digit BD
-FOR                                             = "for"         !letter_digit BD
+DEFAULT                                         = "default"     !letter_digit SPC+
+DEFER                                           = "defer"       !letter_digit SPC+
+ELSE                                            = "else"        !letter_digit SPC+
+FALLTHROUGH                                     = "fallthrough" !letter_digit SPC+
+FOR                                             = "for"         !letter_digit SPC+
 
-FUNC                                            = "func"        !letter_digit BD
-GO                                              = "go"          !letter_digit BD
-GOTO                                            = "goto"        !letter_digit BD
-IF                                              = "if"          !letter_digit BD
-IMPORT
+FUNC                                            = "func"        !letter_digit SPC+
+GO                                              = "go"          !letter_digit SPC+
+GOTO                                            = "goto"        !letter_digit SPC+
+IF                                              = "if"          !letter_digit SPC+
+IMPORT                                          = "import"      !letter_digit SPC+
 
-INTERFACE                                       = "interface"   !letter_digit BD
-MAP                                             = "map"         !letter_digit BD
-PACKAGE                                         = "package"     !letter_digit BD
-RANGE                                           = "range"       !letter_digit BD
-RETURN                                          = "return"      !letter_digit BD
+INTERFACE                                       = "interface"   !letter_digit SPC+
+MAP                                             = "map"         !letter_digit SPC+
+PACKAGE                                         = "package"     !letter_digit SPC+
+RANGE                                           = "range"       !letter_digit SPC+
+RETURN                                          = "return"      !letter_digit SPC+
 
-SELECT                                          = "select"      !letter_digit BD
-STRUCT                                          = "struct"      !letter_digit BD
-SWITCH                                          = "switch"      !letter_digit BD
-TYPE                                            = "type"        !letter_digit BD
-VAR                                             = "var"         !letter_digit BD
+SELECT                                          = "select"      !letter_digit SPC+
+STRUCT                                          = "struct"      !letter_digit SPC+
+SWITCH                                          = "switch"      !letter_digit SPC+
+TYPE                                            = "type"        !letter_digit SPC+
+VAR                                             = "var"         !letter_digit SPC+
 
 Keyword           "keyword"                     = (
                                                   "break"
